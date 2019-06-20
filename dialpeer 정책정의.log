@@ -1,0 +1,807 @@
+version 1111111111111111111111111111111111111111111111111111111111111111111111111111111111111111
+
+IPCC-VG-01#sh run
+Building configuration...
+
+
+Current configuration : 22680 bytes
+!
+! Last configuration change at 10:41:20 KST Mon Jul 6 2015
+!
+version 15.4
+no service pad
+service timestamps debug datetime localtime
+service timestamps log datetime localtime
+service password-encryption
+!
+hostname IPCC-VG-01
+!
+boot-start-marker
+boot system flash:c2900-universalk9-mz.SPA.154-3.M1.bin
+boot-end-marker
+!
+!
+card type e1 0 0
+enable password 7 047A2A2F27021D1F584A4437040C
+!
+no aaa new-model
+clock timezone KST 9 0
+network-clock-participate wic 0 
+network-clock-select 1 E1 0/0/0
+network-clock-select 2 E1 0/0/1
+!
+!
+!
+!
+!
+!
+no ip source-route
+!
+ip traffic-export profile VG20150629 mode capture
+  bidirectional
+  length 512
+!
+ip traffic-export profile VG mode capture
+!
+!
+!
+!
+!
+!
+!
+!
+ip host media1.ucce.ipcc 172.30.110.27
+ip host media1.ucce.ipcc-backup 172.30.110.28
+ip host media2.ucce.ipcc 172.30.110.28
+ip host media2.ucce.ipcc-backup 172.30.110.27
+ip host vxml1.ucce.ipcc 172.30.110.24
+ip host vxml1.ucce.ipcc-backup 172.30.110.25
+ip host vxml2.ucce.ipcc 172.30.110.25
+ip host vxml2.ucce.ipcc-backup 172.30.110.24
+ip host vxml.ucce.ipcc 172.30.110.11
+ip host skbroadband.com 1.226.64.42
+ip cef
+no ipv6 cef
+multilink bundle-name authenticated
+!
+!
+!
+!
+!         
+isdn switch-type primary-net5
+!
+!
+trunk group PSTN
+!
+cts logging verbose
+!
+!
+voice-card 0
+!
+!
+voice call send-alert
+!
+voice service voip
+ ip address trusted list
+  ipv4 172.30.0.0 255.255.0.0
+  ipv4 14.52.21.207 255.255.255.255
+  ipv4 110.10.100.106 255.255.255.255
+  ipv4 1.226.64.42 255.255.255.255
+ no ip address trusted authenticate
+ mode border-element 
+ allow-connections sip to sip
+ no supplementary-service sip refer
+ signaling forward unconditional
+ fax protocol t38 version 0 ls-redundancy 0 hs-redundancy 0 fallback none
+ sip
+  bind control source-interface GigabitEthernet0/2
+  bind media source-interface GigabitEthernet0/2
+  registrar server expires max 120 min 60
+  early-offer forced
+  no silent-discard untrusted
+  midcall-signaling passthru
+  pass-thru headers 101
+  no call service stop
+!
+voice class codec 1
+ codec preference 1 g711ulaw
+ codec preference 2 g711alaw
+!
+!
+voice class sip-profiles 1
+ request INVITE sip-header Call-Info copy ".*<sip:(.*)@(.*)" u01 
+ request INVITE sip-header P-Asserted-Identity modify "P-Asserted-Identity:(.*)@(.*)>" "P-Asserted-Identity:<sip:\u01@\2>" 
+!
+voice class sip-profiles 2
+ request INVITE sip-header Call-Info copy "<sip:(.*)@(.*)" u01 
+ request INVITE sip-header Remote-Party-ID modify "<sip:(.*)@(.*)" "<sip:\u01@\2" 
+ request INVITE sip-header P-Asserted-Identity modify "<sip:(.*)@(.*)" "<sip:\u01@\2" 
+ request INVITE sip-header Call-Info add "Call-Info: <IPCC>" 
+ request INVITE sip-header Call-Info modify "(.*)" "\1;originaldn=\u01" 
+ request INVITE sip-header To copy "<sip:(.*)@(.*)" u01 
+ request INVITE sip-header Call-Info modify "(.*)" "\1-\u01" 
+ request INVITE sip-header To modify "<sip:(.*)@(.*)" "<sip:40050@\2" 
+ request INVITE sip-header SIP-Req-URI modify "(.*)sip:(.*)@(.*)" "\1sip:40050@\3" 
+ request ACK sip-header To modify "<sip:(.*)@(.*)" "<sip:40050@\2" 
+ request ACK sip-header SIP-Req-URI modify "(.*)sip:(.*)@(.*)" "\1sip:40050@\3" 
+ request BYE sip-header To modify "<sip:(.*)@(.*)" "<sip:40050@\2" 
+ request BYE sip-header SIP-Req-URI modify "(.*)sip:(.*)@(.*)" "\1sip:40050@\3" 
+ request CANCEL sip-header To modify "<sip:(.*)@(.*)" "<sip:40050@\2" 
+ request CANCEL sip-header SIP-Req-URI modify "(.*)sip:(.*)@(.*)" "\1sip:40050@\3" 
+ request COMET sip-header To modify "<sip:(.*)@(.*)" "<sip:40050@\2" 
+ request COMET sip-header SIP-Req-URI modify "(.*)sip:(.*)@(.*)" "\1sip:40050@\3" 
+ request INFO sip-header To modify "<sip:(.*)@(.*)" "<sip:40050@\2" 
+ request INFO sip-header SIP-Req-URI modify "(.*)sip:(.*)@(.*)" "\1sip:40050@\3" 
+ request NOTIFY sip-header To modify "<sip:(.*)@(.*)" "<sip:40050@\2" 
+ request NOTIFY sip-header SIP-Req-URI modify "(.*)sip:(.*)@(.*)" "\1sip:40050@\3" 
+ request OPTIONS sip-header To modify "<sip:(.*)@(.*)" "<sip:40050@\2" 
+ request OPTIONS sip-header SIP-Req-URI modify "(.*)sip:(.*)@(.*)" "\1sip:40050@\3" 
+ request PRACK sip-header To modify "<sip:(.*)@(.*)" "<sip:40050@\2" 
+ request PRACK sip-header SIP-Req-URI modify "(.*)sip:(.*)@(.*)" "\1sip:40050@\3" 
+ request PUBLISH sip-header To modify "<sip:(.*)@(.*)" "<sip:40050@\2" 
+ request PUBLISH sip-header SIP-Req-URI modify "(.*)sip:(.*)@(.*)" "\1sip:40050@\3" 
+ request REFER sip-header To modify "<sip:(.*)@(.*)" "<sip:40050@\2" 
+ request REFER sip-header SIP-Req-URI modify "(.*)sip:(.*)@(.*)" "\1sip:40050@\3" 
+ request REGISTER sip-header To modify "<sip:(.*)@(.*)" "<sip:40050@\2" 
+ request REGISTER sip-header SIP-Req-URI modify "(.*)sip:(.*)@(.*)" "\1sip:40050@\3" 
+ request REINVITE sip-header To modify "<sip:(.*)@(.*)" "<sip:40050@\2" 
+ request REINVITE sip-header SIP-Req-URI modify "(.*)sip:(.*)@(.*)" "\1sip:40050@\3" 
+ request SUBSCRIBE sip-header To modify "<sip:(.*)@(.*)" "<sip:40050@\2" 
+ request SUBSCRIBE sip-header SIP-Req-URI modify "(.*)sip:(.*)@(.*)" "\1sip:40050@\3" 
+ request UPDATE sip-header To modify "<sip:(.*)@(.*)" "<sip:40050@\2" 
+ request INVITE sip-header Remote-Party-ID modify "(.*)sip:(.*)@(.*)" "\1sip:\2@\3" 
+!
+voice class sip-profiles 3
+ request INVITE sip-header To copy "<sip:(.*)@(.*)" u01 
+ request INVITE sip-header Call-Info add "Call-Info: <IPCC-VG-01:5060>" 
+ request INVITE sip-header Call-Info modify "(.*)" "\1;originaldn=\u01" 
+ request INVITE sip-header To modify "<sip:4(.*)@(.*)" "<sip:\1@\2" 
+ request INVITE sip-header SIP-Req-URI modify "(.*)sip:4(.*)@(.*)" "\1sip:\2@\3" 
+ request ACK sip-header To modify "<sip:4(.*)@(.*)" "<sip:\1@\2" 
+ request ACK sip-header SIP-Req-URI modify "(.*)sip:4(.*)@(.*)" "\1sip:\2@\3" 
+ request BYE sip-header To modify "<sip:4(.*)@(.*)" "<sip:\1@\2" 
+ request BYE sip-header SIP-Req-URI modify "(.*)sip:4(.*)@(.*)" "\1sip:\2@\3" 
+ request CANCEL sip-header To modify "<sip:4(.*)@(.*)" "<sip:\1@\2" 
+ request CANCEL sip-header SIP-Req-URI modify "(.*)sip:4(.*)@(.*)" "\1sip:\2@\3" 
+ request COMET sip-header To modify "<sip:4(.*)@(.*)" "<sip:\1@\2" 
+ request COMET sip-header SIP-Req-URI modify "(.*)sip:4(.*)@(.*)" "\1sip:\2@\3" 
+ request INFO sip-header To modify "<sip:4(.*)@(.*)" "<sip:\1@\2" 
+ request INFO sip-header SIP-Req-URI modify "(.*)sip:4(.*)@(.*)" "\1sip:\2@\3" 
+ request NOTIFY sip-header To modify "<sip:4(.*)@(.*)" "<sip:\1@\2" 
+ request NOTIFY sip-header SIP-Req-URI modify "(.*)sip:4(.*)@(.*)" "\1sip:\2@\3" 
+ request OPTIONS sip-header To modify "<sip:4(.*)@(.*)" "<sip:\1@\2" 
+ request OPTIONS sip-header SIP-Req-URI modify "(.*)sip:4(.*)@(.*)" "\1sip:\2@\3" 
+ request PRACK sip-header To modify "<sip:4(.*)@(.*)" "<sip:\1@\2" 
+ request PRACK sip-header SIP-Req-URI modify "(.*)sip:4(.*)@(.*)" "\1sip:\2@\3" 
+ request PUBLISH sip-header To modify "<sip:4(.*)@(.*)" "<sip:\1@\2" 
+ request PUBLISH sip-header SIP-Req-URI modify "(.*)sip:4(.*)@(.*)" "\1sip:\2@\3" 
+ request REFER sip-header To modify "<sip:4(.*)@(.*)" "<sip:\1@\2" 
+ request REFER sip-header SIP-Req-URI modify "(.*)sip:4(.*)@(.*)" "\1sip:\2@\3" 
+ request REGISTER sip-header To modify "<sip:4(.*)@(.*)" "<sip:\1@\2" 
+ request REGISTER sip-header SIP-Req-URI modify "(.*)sip:4(.*)@(.*)" "\1sip:\2@\3" 
+ request REINVITE sip-header To modify "<sip:4(.*)@(.*)" "<sip:\1@\2" 
+ request REINVITE sip-header SIP-Req-URI modify "(.*)sip:4(.*)@(.*)" "\1sip:\2@\3" 
+ request SUBSCRIBE sip-header To modify "<sip:4(.*)@(.*)" "<sip:\1@\2" 
+ request SUBSCRIBE sip-header SIP-Req-URI modify "(.*)sip:4(.*)@(.*)" "\1sip:\2@\3" 
+ request UPDATE sip-header To modify "<sip:4(.*)@(.*)" "<sip:\1@\2" 
+!
+!
+voice class sip-hdr-passthrulist 101
+ passthru-hdr Call-Info
+ passthru-hdr Requested-By
+!
+!
+!
+!
+voice translation-rule 1
+ rule 1 /^3500/ /40001/
+ rule 2 /^3501/ /40002/
+ rule 3 /^3505/ /40003/
+ rule 4 /^3510/ /40004/
+ rule 5 /^3511/ /40005/
+ rule 6 /^3518/ /40006/
+ rule 7 /^3520/ /40007/
+ rule 8 /^3522/ /40008/
+ rule 9 /^3524/ /40009/
+ rule 10 /^3527/ /40010/
+ rule 11 /^3530/ /40011/
+ rule 12 /^3531/ /40012/
+ rule 13 /^3535/ /40013/
+ rule 14 /^3538/ /40014/
+ rule 15 /^3540/ /40015/
+ rule 16 /^3541/ /40016/
+ rule 17 /^3543/ /40017/
+ rule 18 /^3544/ /40018/
+ rule 19 /^3566/ /40019/
+ rule 20 /^3577/ /40020/
+ rule 21 /^3578/ /40021/
+ rule 22 /^3580/ /40022/
+ rule 23 /^3582/ /40023/
+ rule 24 /^3584/ /40024/
+ rule 25 /^3586/ /40025/
+ rule 26 /^3588/ /40026/
+ rule 27 /^3590/ /40027/
+ rule 28 /^3593/ /40028/
+ rule 29 /^3595/ /40032/
+ rule 30 /^3597/ /40030/
+ rule 31 /^3598/ /40033/
+ rule 32 /^3599/ /40029/
+ rule 33 /^3594/ /40031/
+ rule 50 /\(^.*\)/ /484\1/
+!
+voice translation-rule 2
+ rule 1 /07078724671/ /40031/
+ rule 2 /^3507/ /40032/
+ rule 3 /^3508/ /40101/
+ rule 4 /^3509/ /40010/
+ rule 5 /^3514/ /40002/
+ rule 6 /^3516/ /40004/
+ rule 7 /^3515/ /40031/
+ rule 8 /^3506/ /40020/
+ rule 9 /07047460399/ /40031/
+ rule 10 /07047460360/ /40031/
+ rule 20 /\(^.*\)/ /40031/
+!
+!
+voice translation-profile ucce_IN
+ translate called 1
+!
+voice translation-profile ucce_SK_IN
+ translate called 2
+!
+!
+!
+http client cache memory pool 15000
+http client cache memory file 2048
+http client cache refresh 864000
+no http client connection persistent
+http client connection timeout 60
+http client connection idle timeout 10
+http client response timeout 3
+ivr prompt memory 15000
+!
+application
+ service new-call flash:bootstrap.vxml
+  paramspace english language en
+  paramspace english index 0
+  paramspace english location flash:
+  paramspace english prefix en
+ !
+ service survivability flash:survivability.tcl
+  paramspace english language en
+  paramspace english index 0
+  paramspace english location flash:
+  paramspace english prefix en
+  param open-hours-agent0 <retry>
+  param open-hours-time0 0123456:0000-2359
+ !
+ service ringtone flash:ringtone.tcl
+  paramspace english index 0
+  paramspace english language en
+  paramspace english location flash:
+  paramspace english prefix en
+ !
+ service cvperror flash:cvperror.tcl
+  paramspace english index 0
+  paramspace english language en
+  paramspace english location flash:
+  paramspace english prefix en
+ !
+ service bootstrap flash:bootstrap.tcl
+  paramspace english language en
+  paramspace english index 0
+  paramspace english location flash:
+  paramspace english prefix en
+ !
+!
+license udi pid CISCO2921/K9 sn FGL191211E3
+hw-module pvdm 0/0
+!
+!
+!
+username VGUser password 7 096D6F20312646435A5F450A3D23
+!
+redundancy
+!
+!
+controller E1 0/0/0
+ framing NO-CRC4 
+ pri-group timeslots 1-31
+!
+controller E1 0/0/1
+!
+ip ssh authentication-retries 5
+ip ssh version 1
+!
+!
+!
+!
+interface Embedded-Service-Engine0/0
+ no ip address
+ shutdown
+!
+interface GigabitEthernet0/0
+ backup interface GigabitEthernet0/1
+ ip address 172.30.110.11 255.255.255.0
+ ip mask-reply
+ no ip redirects
+ no ip unreachables
+ ip directed-broadcast
+ no ip proxy-arp
+ duplex auto
+ speed auto
+!
+interface GigabitEthernet0/1
+ no ip address
+ duplex auto
+ speed auto
+!
+interface GigabitEthernet0/2
+ ip address 180.210.22.11 255.255.255.192
+ ip mask-reply
+ no ip redirects
+ no ip unreachables
+ ip directed-broadcast
+ no ip proxy-arp
+ ip traffic-export apply VG20150629 size 2000000
+ duplex auto
+ speed auto
+!
+interface Serial0/0/0:15
+ no ip address
+ encapsulation hdlc
+ isdn switch-type primary-net5
+ isdn overlap-receiving
+ isdn incoming-voice voice
+ trunk-group PSTN
+ no cdp enable
+!
+ip forward-protocol nd
+!
+ip http server
+no ip http secure-server
+ip http max-connections 100
+ip http timeout-policy idle 600 life 86400 requests 86400
+!
+no ip nat service sip udp port 5060
+ip route 0.0.0.0 0.0.0.0 180.210.22.1
+ip route 172.0.0.0 255.0.0.0 172.30.110.254
+!
+ip access-list standard VTY_FILTER
+ permit 172.30.110.0 0.0.0.255
+ permit 172.30.200.0 0.0.0.255
+!
+!
+!
+!
+control-plane
+!
+!
+voice-port 0/0/0:15
+ cptone KR
+ bearer-cap Speech
+uc wsapi
+ message-exchange max-failures 100
+ response-timeout 10
+ source-address 172.30.110.11
+ probing interval negative 20
+ probing interval keepalive 255
+ !        
+ provider xmf
+  remote-url 1 http://172.30.110.21:8090/ucm_xmf
+  remote-url 2 http://172.30.110.22:8090/ucm_xmf
+  remote-url 3 http://172.30.110.23:8090/ucm_xmf
+ !
+ !
+ !
+!
+mgcp behavior rsip-range tgcp-only
+mgcp behavior comedia-role none
+mgcp behavior comedia-check-media-src disable
+mgcp behavior comedia-sdp-force disable
+!
+mgcp profile default
+!
+!
+!
+!
+
+dial-peer voice 909090 voip
+ description *** CVP Bootstrap ***
+ service bootstrap
+ session protocol sipv2
+ session target sip-server
+ incoming called-number 4999[1-3].T
+ voice-class codec 1  
+ voice-class sip rel1xx disable
+ voice-class sip bind control source-interface GigabitEthernet0/0
+ voice-class sip bind media source-interface GigabitEthernet0/0
+ dtmf-relay rtp-nte
+ no vad
+!
+
+dial-peer voice 919191 voip
+ description *** ringtone ***
+ service ringtone
+ session protocol sipv2
+ session target sip-server
+ incoming called-number 9191T
+ voice-class codec 1  
+ voice-class sip bind control source-interface GigabitEthernet0/0
+ voice-class sip bind media source-interface GigabitEthernet0/0
+ dtmf-relay rtp-nte
+ no vad
+!
+dial-peer voice 929292 voip
+ description *** cvperror ***
+ service cvperror
+ session protocol sipv2
+ session target sip-server
+ incoming called-number 9292T
+ voice-class codec 1  
+ voice-class sip bind control source-interface GigabitEthernet0/0
+ voice-class sip bind media source-interface GigabitEthernet0/0
+ dtmf-relay rtp-nte
+ no vad
+!
+
+
+
+
+dial-peer voice 101000 pots
+ trunkgroup PSTN
+ description ## Call From PSTN kt##
+ translation-profile incoming ucce_IN
+ incoming called-number .T
+ direct-inward-dial
+!
+
+dial-peer voice 370100 voip
+ description ## Call to CVP01##
+ preference 1
+ service survivability
+ destination-pattern 4....
+ session protocol sipv2
+ session target ipv4:172.30.110.24
+ voice-class codec 1  
+ voice-class sip options-keepalive retry 2
+ voice-class sip bind control source-interface GigabitEthernet0/0
+ voice-class sip bind media source-interface GigabitEthernet0/0
+ dtmf-relay rtp-nte
+!
+
+dial-peer voice 370200 voip
+ description ## Call to CVP02 ##
+ preference 1
+ service survivability
+ destination-pattern 4....
+ session protocol sipv2
+ session target ipv4:172.30.110.25
+ voice-class codec 1  
+ voice-class sip options-keepalive retry 2
+ voice-class sip bind control source-interface GigabitEthernet0/0
+ voice-class sip bind media source-interface GigabitEthernet0/0
+ dtmf-relay rtp-nte
+!
+
+
+dial-peer voice 310000 voip
+ description ## CUCM to VG INBOUND ##
+ session protocol sipv2
+ session target sip-server
+ incoming called-number .T
+ voice-class sip bind control source-interface GigabitEthernet0/0
+ voice-class sip bind media source-interface GigabitEthernet0/0
+ dtmf-relay rtp-nte
+ codec g711ulaw
+ no vad
+!
+dial-peer voice 360100 voip
+ description ## Call to CUCMPUB ##
+ preference 2
+ destination-pattern [3-4]5..
+ session protocol sipv2
+ session target ipv4:172.30.110.21
+ voice-class codec 1  
+ voice-class sip options-keepalive retry 2
+ voice-class sip bind control source-interface GigabitEthernet0/0
+ voice-class sip bind media source-interface GigabitEthernet0/0
+ dtmf-relay rtp-nte
+ no vad
+!
+dial-peer voice 360200 voip
+ description ## Call to CUCMSUB01 ##
+ preference 1
+ destination-pattern [3-4]5..
+ session protocol sipv2
+ session target ipv4:172.30.110.22
+ voice-class codec 1  
+ voice-class sip options-keepalive retry 2
+ voice-class sip bind control source-interface GigabitEthernet0/0
+ voice-class sip bind media source-interface GigabitEthernet0/0
+ dtmf-relay rtp-nte
+ no vad
+!
+dial-peer voice 360300 voip
+ description ## Call to CUCMSUB02 내선 ##
+ preference 1
+ destination-pattern [3-4]5..
+ session protocol sipv2
+ session target ipv4:172.30.110.23
+ voice-class codec 1  
+ voice-class sip options-keepalive retry 2
+ voice-class sip bind control source-interface GigabitEthernet0/0
+ voice-class sip bind media source-interface GigabitEthernet0/0
+ dtmf-relay rtp-nte
+ no vad
+!
+dial-peer voice 360101 voip
+ description ## DID to CUCMP01 routepoint ##
+ preference 2
+ destination-pattern 435..
+ session protocol sipv2
+ session target ipv4:172.30.110.21
+ voice-class codec 1  
+ voice-class sip profiles 3
+ voice-class sip options-keepalive retry 2
+ voice-class sip bind control source-interface GigabitEthernet0/0
+ voice-class sip bind media source-interface GigabitEthernet0/0
+ dtmf-relay rtp-nte
+ no vad
+!
+dial-peer voice 360102 voip
+ description ## DID to CUCMSUB01 routepoint##
+ preference 2
+ destination-pattern 435..
+ session protocol sipv2
+ session target ipv4:172.30.110.22
+ voice-class codec 1  
+ voice-class sip profiles 3
+ voice-class sip options-keepalive retry 2
+ voice-class sip bind control source-interface GigabitEthernet0/0
+ voice-class sip bind media source-interface GigabitEthernet0/0
+ dtmf-relay rtp-nte
+ no vad
+!
+dial-peer voice 360103 voip
+ description ## DID to CUCMSUB02 routepoint##
+ preference 2
+ destination-pattern 435..
+ session protocol sipv2
+ session target ipv4:172.30.110.23
+ voice-class codec 1  
+ voice-class sip profiles 3
+ voice-class sip options-keepalive retry 2
+ voice-class sip bind control source-interface GigabitEthernet0/0
+ voice-class sip bind media source-interface GigabitEthernet0/0
+ dtmf-relay rtp-nte
+ no vad
+!
+dial-peer voice 360103 voip
+ description ## DID to CUCMPUB ##
+ preference 2
+ destination-pattern 48435..
+ session protocol sipv2
+ session target ipv4:172.30.110.21
+ voice-class codec 1  
+ voice-class sip options-keepalive retry 2
+ voice-class sip bind control source-interface GigabitEthernet0/0
+ voice-class sip bind media source-interface GigabitEthernet0/0
+ dtmf-relay rtp-nte
+ no vad
+!         
+dial-peer voice 360203 voip
+ description ## DID to CUCMS01 ##
+ preference 1
+ destination-pattern 48435..
+ session protocol sipv2
+ session target ipv4:172.30.110.22
+ voice-class codec 1  
+ voice-class sip options-keepalive retry 2
+ voice-class sip bind control source-interface GigabitEthernet0/0
+ voice-class sip bind media source-interface GigabitEthernet0/0
+ dtmf-relay rtp-nte
+ no vad
+!
+dial-peer voice 360303 voip
+ description ## DID to CUCMS02 ##
+ preference 1
+ destination-pattern 48435..
+ session protocol sipv2
+ session target ipv4:172.30.110.23
+ voice-class codec 1  
+ voice-class sip options-keepalive retry 2
+ voice-class sip bind control source-interface GigabitEthernet0/0
+ voice-class sip bind media source-interface GigabitEthernet0/0
+ dtmf-relay rtp-nte
+ no vad
+!
+dial-peer voice 350000 voip
+ description ## 070 OUTBOUND ##
+ preference 1
+ destination-pattern .T
+ session protocol sipv2
+ session target sip-server
+ session transport udp
+ voice-class codec 1  
+ voice-class sip asserted-id pai
+ voice-class sip profiles 1
+ dtmf-relay rtp-nte
+!
+
+##회선도 cluster로 구분함
+dial-peer voice 351000 voip
+ description ## KT OUTBOUND ##
+ preference 2
+ incoming called-number .T
+ voice-class codec 1  
+ voice-class sip bind control source-interface GigabitEthernet0/0
+ voice-class sip bind media source-interface GigabitEthernet0/0
+ dtmf-relay rtp-nte
+ no vad
+!
+
+
+dial-peer voice 151000 pots
+ trunkgroup PSTN
+ description ## KT OUTBOUND to PSTN ##
+ destination-pattern .T
+ progress_ind setup enable 3
+ progress_ind alert enable 8
+ progress_ind progress enable 8
+ progress_ind disconnect enable 8
+!
+
+dial-peer voice 360104 voip
+ description ## CVP to CUCMPUB ##
+ preference 2
+ destination-pattern 8.T
+ session protocol sipv2
+ session target ipv4:172.30.110.21
+ voice-class codec 1  
+ voice-class sip options-keepalive retry 2
+ voice-class sip bind control source-interface GigabitEthernet0/0
+ voice-class sip bind media source-interface GigabitEthernet0/0
+ dtmf-relay rtp-nte
+ no vad
+!
+dial-peer voice 360204 voip
+ description ## CVP to CUCMSUB01 ##
+ preference 1
+ destination-pattern 8.T
+ session protocol sipv2
+ session target ipv4:172.30.110.22
+ voice-class codec 1  
+ voice-class sip options-keepalive retry 2
+ voice-class sip bind control source-interface GigabitEthernet0/0
+ voice-class sip bind media source-interface GigabitEthernet0/0
+ dtmf-relay rtp-nte
+ no vad
+!
+dial-peer voice 360304 voip
+ description ## CVP to CUCMSUB02 ##
+ preference 1
+ destination-pattern 8.T
+ session protocol sipv2
+ session target ipv4:172.30.110.23
+ voice-class codec 1  
+ voice-class sip options-keepalive retry 2
+ voice-class sip bind control source-interface GigabitEthernet0/0
+ voice-class sip bind media source-interface GigabitEthernet0/0
+ dtmf-relay rtp-nte
+ no vad
+!
+dial-peer voice 370101 voip
+ description ## Incoming DID to CVP01 ##
+ preference 1
+ destination-pattern 435..
+ session protocol sipv2
+ session target ipv4:172.30.110.24
+ voice-class codec 1  
+ voice-class sip profiles 2
+ voice-class sip options-keepalive retry 2
+ voice-class sip bind control source-interface GigabitEthernet0/0
+ voice-class sip bind media source-interface GigabitEthernet0/0
+ dtmf-relay rtp-nte
+ no vad
+!
+dial-peer voice 370201 voip
+ description ## Incoming DID CVP02 ##
+ preference 1
+ destination-pattern 435..
+ session protocol sipv2
+ session target ipv4:172.30.110.25
+ voice-class codec 1  
+ voice-class sip profiles 2
+ voice-class sip options-keepalive retry 2
+ voice-class sip bind control source-interface GigabitEthernet0/0
+ voice-class sip bind media source-interface GigabitEthernet0/0
+ dtmf-relay rtp-nte
+ no vad
+!
+
+dial-peer voice 300000 voip
+ translation-profile incoming ucce_SK_IN
+ preference 1
+ session protocol sipv2
+ session target sip-server
+ session transport tcp
+ incoming called-number [30][75].T
+ voice-class codec 1  
+ voice-class sip bind control source-interface GigabitEthernet0/2
+ voice-class sip bind media source-interface GigabitEthernet0/2
+ dtmf-relay rtp-nte
+!
+
+dial-peer voice 80000 voip
+ translation-profile incoming ucce_SK_IN
+ preference 1
+ session protocol sipv2
+ session target sip-server
+ session transport udp
+ incoming called-number 07047460399
+ voice-class codec 1  
+ voice-class sip bind control source-interface GigabitEthernet0/2
+ voice-class sip bind media source-interface GigabitEthernet0/2
+ dtmf-relay rtp-nte
+
+!
+dial-peer voice 80001 voip
+ translation-profile incoming ucce_IN
+ session protocol sipv2
+ session target sip-server
+ incoming called-number 3517
+ voice-class sip bind control source-interface GigabitEthernet0/2
+ voice-class sip bind media source-interface GigabitEthernet0/2
+ dtmf-relay rtp-nte
+ codec g711ulaw
+!
+!
+gateway 
+ timer receive-rtp 1200
+!
+sip-ua 
+ credentials number 07087690360 username AAIHealth password 7 07587319165F4E524F405C3D336F15 realm skbroadband.com
+ timers trying 1000
+ registrar ipv4:1.226.64.42 expires 120 auth-realm skbroadband.com
+ sip-server ipv4:1.226.64.42:5060
+!
+!
+!
+gatekeeper
+ shutdown
+!
+!
+!
+line con 0
+ exec-timeout 5 0
+line aux 0
+ exec-timeout 5 0
+ no exec
+line 2
+ no activation-character
+ no exec
+ transport preferred none
+ transport output pad telnet rlogin lapb-ta mop udptn v120 ssh
+ stopbits 1
+line vty 0 4
+ exec-timeout 0 0
+ password 7 096D6F20312646435A5F450A3D23
+ logging synchronous
+ login local
+ transport input telnet ssh
+!
+scheduler allocate 20000 1000
+ntp master
+ntp update-calendar
+ntp server 203.248.240.103
+!
+end
+
+IPCC-VG-01# 
+IPCC-VG-01#
+IPCC-VG-01#
+IPCC-VG-01#
+IPCC-VG-01#
+IPCC-VG-01#
+IPCC-VG-01#
