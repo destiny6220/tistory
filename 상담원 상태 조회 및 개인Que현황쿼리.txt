@@ -1,0 +1,17 @@
+use smins_awdb
+
+select
+	A.PeripheralNumber		-- 상담원 번호
+	, A.EnterpriseName 		-- 상담원 이름 (CTI에 저장된 이름)
+	, A.Description			-- Description (상담원 한글 이름)
+	, ART.AgentState		-- 상담원 상태 코드 
+	, ART.ReasonCode		-- 상담원 이석 사유 코드
+	, ART.Extension			-- 상담원 사용 전화기 번호
+	, ART.RouterCallsQueueNow	-- 개인 Que 대기 현황
+	, ART.RouterLongestCallQ	-- 가장 오래 기다른 Que 시간 
+from
+	Agent_Real_Time ART,
+	Agent A
+where
+	ART.SkillTargetID = A.SkillTargetID
+	and art.Extension = ? -- 내선번호로 검색 실시
